@@ -2,6 +2,8 @@
 
 A Windows desktop application written in C# (.NET 6) that converts photos with GPS EXIF metadata into GPX track files. The application scans folders recursively, extracts GPS coordinates from supported image formats, and generates standard GPX files with tracks for use in mapping applications, GPS devices, or other location-based services.
 
+![App Screenshot](images/GBX_From_Photos.png)
+
 ## Features
 
 - **Recursive Folder Scanning**: Automatically searches through all subfolders
