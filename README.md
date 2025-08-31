@@ -1,15 +1,16 @@
 # GBX_From_Photos
 
-A Windows desktop application written in C# (.NET 6) that converts photos with GPS EXIF metadata into GPX waypoint files. The application scans folders recursively, extracts GPS coordinates from supported image formats, and generates standard GPX files for use in mapping applications, GPS devices, or other location-based services.
+A Windows desktop application written in C# (.NET 6) that converts photos with GPS EXIF metadata into GPX track files. The application scans folders recursively, extracts GPS coordinates from supported image formats, and generates standard GPX files with tracks for use in mapping applications, GPS devices, or other location-based services.
 
 ## Features
 
 - **Recursive Folder Scanning**: Automatically searches through all subfolders
 - **Multiple Image Format Support**: Handles JPG, JPEG, PNG, and HEIC files
 - **GPS EXIF Extraction**: Uses MetadataExtractor library for reliable GPS data extraction
-- **Real-time Progress Tracking**: Live updates on processing status with progress bar
+- **Real-time Progress Tracking**: Live updates on processing status with progress bar and success rate
 - **Comprehensive Logging**: Detailed error logging for troubleshooting
-- **Standard GPX Output**: Generates GPX 1.1 compliant files with waypoints only
+- **Standard GPX Output**: Generates GPX 1.1 compliant files with tracks and track segments
+- **Dual Point Generation**: Creates two track points per photo for enhanced mapping visualization
 - **Non-blocking UI**: Asynchronous processing keeps the interface responsive
 
 ## Supported Image Formats
@@ -87,6 +88,7 @@ A Windows desktop application written in C# (.NET 6) that converts photos with G
    - **Processing Status**: Shows total photos found, processed, and remaining
    - **Results**: Displays successful extractions, skipped files, and errors
    - **Progress Bar**: Visual indication of completion percentage
+   - **Success Rate**: Real-time percentage of successfully processed photos
 
 5. **Completion**
    - When finished, a summary dialog will appear
@@ -98,8 +100,9 @@ A Windows desktop application written in C# (.NET 6) that converts photos with G
 #### GPX File
 - **Location**: `output/photos_export{timestamp}.gpx`
 - **Format**: Standard GPX 1.1 XML format
-- **Content**: Waypoints only (no tracks or routes)
-- **Naming**: Each waypoint named after the source photo filename
+- **Content**: Tracks with track segments (no waypoints)
+- **Structure**: Each photo creates a track with two track points for enhanced visualization
+- **Naming**: Each track named after the source photo filename
 
 #### Error Log
 - **Location**: `output/errors.log`
@@ -108,16 +111,26 @@ A Windows desktop application written in C# (.NET 6) that converts photos with G
 
 ### Example GPX Output
 ```xml
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <gpx version="1.1" creator="PhotoToGPX" xmlns="http://www.topografix.com/GPX/1/1">
-  <wpt lat="35.6895" lon="139.6917">
+  <trk>
     <name>IMG_1234.JPG</name>
-  </wpt>
-  <wpt lat="34.0522" lon="-118.2437">
+    <trkseg>
+      <trkpt lat="35.6895" lon="139.6917" />
+      <trkpt lat="35.68951" lon="139.6917" />
+    </trkseg>
+  </trk>
+  <trk>
     <name>VacationPic.jpeg</name>
-  </wpt>
+    <trkseg>
+      <trkpt lat="34.0522" lon="-118.2437" />
+      <trkpt lat="34.05221" lon="-118.2437" />
+    </trkseg>
+  </trk>
 </gpx>
 ```
+
+**Note**: Each photo generates two track points - the original GPS location and an offset point approximately 1.1 meters north. This dual-point approach enhances mapping visualization and ensures compatibility with various GPS applications.
 
 ## Troubleshooting
 
@@ -169,6 +182,12 @@ A Windows desktop application written in C# (.NET 6) that converts photos with G
 - **Error Resilience**: Individual file failures don't stop the entire process
 - **Resource Management**: Proper disposal of file handles and streams
 
+### GPX Generation Strategy
+- **Track-based Output**: Generates `<trk>` elements instead of `<wpt>` elements
+- **Dual Point System**: Creates two track points per photo for enhanced mapping
+- **Offset Calculation**: Second point is offset by 0.00001 degrees (~1.1 meters north)
+- **Track Segments**: Each photo creates its own track with a single track segment
+
 ## Development
 
 ### Project Structure
@@ -188,8 +207,8 @@ GBX_From_Photos/
 - **MainForm**: User interface and event handling
 - **PhotoProcessor**: Core business logic for photo processing
 - **GpsWaypoint**: Data structure for GPS coordinates
-- **ProcessingProgress**: Progress reporting structure
-- **ProcessingResult**: Final processing results
+- **ProcessingProgress**: Progress reporting structure with success rate
+- **ProcessingResult**: Final processing results with file paths
 
 ### Dependencies
 - **MetadataExtractor**: EXIF and GPS data extraction
@@ -233,8 +252,13 @@ For issues, questions, or feature requests:
 
 ## Version History
 
+- **v1.1.0**: Enhanced GPX output with tracks and dual point generation
+  - Changed from waypoint-based to track-based GPX output
+  - Added dual track points per photo for enhanced visualization
+  - Enhanced progress tracking with success rate percentage
+  - Improved error handling and logging
 - **v1.0.0**: Initial release with basic photo-to-GPX conversion functionality
-- Support for JPG, JPEG, PNG, and HEIC formats
-- Recursive folder scanning
-- Real-time progress tracking
-- Comprehensive error logging
+  - Support for JPG, JPEG, PNG, and HEIC formats
+  - Recursive folder scanning
+  - Real-time progress tracking
+  - Comprehensive error logging
