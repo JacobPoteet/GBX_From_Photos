@@ -12,7 +12,7 @@ using System.Xml;
 using MetadataExtractor;
 using MetadataExtractor.Formats.Exif;
 
-namespace GBX_From_Photos
+namespace GPX_From_Photos
 {
     public partial class MainForm : Form
     {
