@@ -29,9 +29,9 @@ namespace GBX_From_Photos
 
         private void InitializeOutputFolder()
         {
-            if (!Directory.Exists(outputFolder))
+            if (!System.IO.Directory.Exists(outputFolder))
             {
-                Directory.CreateDirectory(outputFolder);
+                System.IO.Directory.CreateDirectory(outputFolder);
             }
         }
 
@@ -91,6 +91,8 @@ namespace GBX_From_Photos
                     btnSelectFolder.Enabled = true;
                 });
             }
+
+            Console.WriteLine("Current Directory: " + System.IO.Directory.GetCurrentDirectory());
         }
 
         private void UpdateProgress(ProcessingProgress progress)

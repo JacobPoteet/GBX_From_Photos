@@ -106,7 +106,7 @@ namespace GBX_From_Photos
             
             try
             {
-                var files = Directory.GetFiles(folderPath, "*.*", SearchOption.AllDirectories);
+                var files = System.IO.Directory.GetFiles(folderPath, "*.*", SearchOption.AllDirectories);
                 
                 foreach (var file in files)
                 {
@@ -163,35 +163,45 @@ namespace GBX_From_Photos
             {
                 Indent = true,
                 IndentChars = "  ",
-                Encoding = System.Text.Encoding.UTF8
+                Encoding = System.Text.Encoding.UTF8,
+                Async = true
             };
 
-            using var writer = XmlWriter.Create(filePath, settings);
-            
-            // Write GPX header
-            await writer.WriteStartDocumentAsync();
-            await writer.WriteStartElementAsync(null, "gpx", null);
-            await writer.WriteAttributeStringAsync(null, "version", null, "1.1");
-            await writer.WriteAttributeStringAsync(null, "creator", null, "PhotoToGPX");
-            await writer.WriteAttributeStringAsync(null, "xmlns", null, "http://www.topografix.com/GPX/1/1");
-
-            // Write waypoints
-            foreach (var waypoint in waypoints)
+            try
             {
-                await writer.WriteStartElementAsync(null, "wpt", null);
-                await writer.WriteAttributeStringAsync(null, "lat", null, waypoint.Latitude.ToString("F6"));
-                await writer.WriteAttributeStringAsync(null, "lon", null, waypoint.Longitude.ToString("F6"));
-                
-                await writer.WriteStartElementAsync(null, "name", null);
-                await writer.WriteStringAsync(waypoint.Name);
-                await writer.WriteEndElementAsync(); // name
-                
-                await writer.WriteEndElementAsync(); // wpt
-            }
+                using var writer = XmlWriter.Create(filePath, settings);
 
-            // Write GPX footer
-            await writer.WriteEndElementAsync(); // gpx
-            await writer.WriteEndDocumentAsync();
+                // Write GPX header
+                await writer.WriteStartDocumentAsync();
+                await writer.WriteStartElementAsync(null, "gpx", "http://www.topografix.com/GPX/1/1");
+                await writer.WriteAttributeStringAsync(null, "version", null, "1.1");
+                await writer.WriteAttributeStringAsync(null, "creator", null, "PhotoToGPX");
+
+                // Write waypoints
+                foreach (var waypoint in waypoints)
+                {
+                    await writer.WriteStartElementAsync(null, "wpt", null);
+                    await writer.WriteAttributeStringAsync(null, "lat", null, waypoint.Latitude.ToString("F6"));
+                    await writer.WriteAttributeStringAsync(null, "lon", null, waypoint.Longitude.ToString("F6"));
+
+                    await writer.WriteStartElementAsync(null, "name", null);
+                    await writer.WriteStringAsync(waypoint.Name);
+                    await writer.WriteEndElementAsync(); // name
+
+                    await writer.WriteEndElementAsync(); // wpt
+                }
+
+                // Write GPX footer
+                await writer.WriteEndElementAsync(); // gpx
+                await writer.WriteEndDocumentAsync();
+
+                writer.Flush(); // <-- Ensure all data is written to disk
+            }
+            catch (Exception ex)
+            {
+                File.AppendAllText("gpx_write_errors.log", $"[{DateTime.Now}] Error writing GPX: {ex.Message}{Environment.NewLine}");
+                throw;
+            }
         }
 
         private void CreateEmptyGpxFile(string filePath)
