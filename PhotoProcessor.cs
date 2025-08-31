@@ -77,6 +77,7 @@ namespace GBX_From_Photos
                     processedCount++;
                     
                     // Update progress
+                    var denominator = successfulCount + skippedCount + errorCount;
                     var progressData = new ProcessingProgress
                     {
                         TotalPhotos = result.TotalPhotos,
@@ -86,7 +87,7 @@ namespace GBX_From_Photos
                         SkippedPhotos = skippedCount,
                         ErrorPhotos = errorCount,
                         Percentage = (int)((double)processedCount / result.TotalPhotos * 100),
-                        SuccessRate = result.TotalPhotos > 0 ? (double)successfulCount / result.TotalPhotos * 100 : 0
+                        SuccessRate = denominator > 0 ? (double)successfulCount / denominator * 100 : 0
                     };
                     
                     progress?.Report(progressData);
@@ -96,10 +97,11 @@ namespace GBX_From_Photos
                 await GenerateGpxFileAsync(gpxFilePath, waypoints);
 
                 // Update final result
+                var finalDenominator = successfulCount + skippedCount + errorCount;
                 result.SuccessfulPhotos = successfulCount;
                 result.SkippedPhotos = skippedCount;
                 result.ErrorPhotos = errorCount;
-                result.SuccessRate = result.TotalPhotos > 0 ? (double)successfulCount / result.TotalPhotos * 100 : 0;
+                result.SuccessRate = finalDenominator > 0 ? (double)successfulCount / finalDenominator * 100 : 0;
 
                 return result;
             }
