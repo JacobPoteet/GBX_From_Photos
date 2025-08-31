@@ -1,4 +1,4 @@
-namespace GBX_From_Photos
+namespace GPX_From_Photos
 {
     internal static class Program
     {

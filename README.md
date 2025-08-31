@@ -2,7 +2,7 @@
 
 A Windows desktop application written in C# (.NET 6) that converts photos with GPS EXIF metadata into GPX track files. The application scans folders recursively, extracts GPS coordinates from supported image formats, and generates standard GPX files with tracks for use in mapping applications, GPS devices, or other location-based services.
 
-![App Screenshot](images/GBX_From_Photos.png)
+![App Screenshot](images/GPX_From_Photos.png)
 
 ## Features
 
@@ -36,41 +36,18 @@ A Windows desktop application written in C# (.NET 6) that converts photos with G
 
 ## Installation & Setup
 
-### Option 1: Build from Source (Recommended)
-
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/yourusername/GBX_From_Photos.git
-   cd GBX_From_Photos
-   ```
-
-2. **Restore NuGet Packages**
-   ```bash
-   dotnet restore
-   ```
-
-3. **Build the Application**
-   ```bash
-   dotnet build --configuration Release
-   ```
-
-4. **Run the Application**
-   ```bash
-   dotnet run --configuration Release
-   ```
-
-### Option 2: Download Pre-built Binary
+### Download Pre-built Binary
 
 1. Download the latest release from the GitHub releases page
 2. Extract the ZIP file to your desired location
-3. Run `GBX_From_Photos.exe`
+3. Run `GPX_From_Photos.exe`
 
 ## Usage Instructions
 
 ### Basic Workflow
 
 1. **Launch the Application**
-   - Double-click `GBX_From_Photos.exe` or run from command line
+   - Double-click `GPX_From_Photos.exe` or run from command line
    - The main window will appear with all controls initially disabled except "Select Folder"
 
 2. **Select Source Folder**
@@ -194,15 +171,15 @@ A Windows desktop application written in C# (.NET 6) that converts photos with G
 
 ### Project Structure
 ```
-GBX_From_Photos/
+GPX_From_Photos/
 ├── MainForm.cs              # Main UI logic
 ├── MainForm.Designer.cs     # Windows Forms designer
 ├── PhotoProcessor.cs        # Core photo processing logic
 ├── Program.cs               # Application entry point
-├── GBX_From_Photos.csproj  # Project file
-├── .gitignore              # Git ignore rules
-├── output/                 # Generated files (gitignored)
-└── README.md               # This file
+├── GPX_From_Photos.csproj   # Project file
+├── .gitignore               # Git ignore rules
+├── output/                  # Generated files (gitignored)
+└── README.md                # This file
 ```
 
 ### Key Classes
