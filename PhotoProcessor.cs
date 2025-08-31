@@ -49,7 +49,17 @@ namespace GBX_From_Photos
                         
                         if (waypoint != null)
                         {
+                            // Add original waypoint
                             waypoints.Add(waypoint);
+
+                            // Add offset waypoint (very close)
+                            waypoints.Add(new GpsWaypoint
+                            {
+                                Latitude = waypoint.Latitude + 0.00001, // ~1.1 meters north
+                                Longitude = waypoint.Longitude,
+                                Name = waypoint.Name + " (offset)"
+                            });
+
                             successfulCount++;
                         }
                         else
@@ -177,25 +187,38 @@ namespace GBX_From_Photos
                 await writer.WriteAttributeStringAsync(null, "version", null, "1.1");
                 await writer.WriteAttributeStringAsync(null, "creator", null, "PhotoToGPX");
 
-                // Write waypoints
-                foreach (var waypoint in waypoints)
+                // Write a track for each photo (pair of waypoints)
+                for (int i = 0; i < waypoints.Count; i += 2)
                 {
-                    await writer.WriteStartElementAsync(null, "wpt", null);
-                    await writer.WriteAttributeStringAsync(null, "lat", null, waypoint.Latitude.ToString("F6"));
-                    await writer.WriteAttributeStringAsync(null, "lon", null, waypoint.Longitude.ToString("F6"));
+                    await writer.WriteStartElementAsync(null, "trk", null);
 
+                    // Track name: use photo name
                     await writer.WriteStartElementAsync(null, "name", null);
-                    await writer.WriteStringAsync(waypoint.Name);
+                    await writer.WriteStringAsync(waypoints[i].Name.Replace(" (offset)", ""));
                     await writer.WriteEndElementAsync(); // name
 
-                    await writer.WriteEndElementAsync(); // wpt
+                    await writer.WriteStartElementAsync(null, "trkseg", null);
+
+                    // Write the original and offset waypoints as track points
+                    await writer.WriteStartElementAsync(null, "trkpt", null);
+                    await writer.WriteAttributeStringAsync(null, "lat", null, waypoints[i].Latitude.ToString("F6"));
+                    await writer.WriteAttributeStringAsync(null, "lon", null, waypoints[i].Longitude.ToString("F6"));
+                    await writer.WriteEndElementAsync(); // trkpt
+
+                    await writer.WriteStartElementAsync(null, "trkpt", null);
+                    await writer.WriteAttributeStringAsync(null, "lat", null, waypoints[i + 1].Latitude.ToString("F6"));
+                    await writer.WriteAttributeStringAsync(null, "lon", null, waypoints[i + 1].Longitude.ToString("F6"));
+                    await writer.WriteEndElementAsync(); // trkpt
+
+                    await writer.WriteEndElementAsync(); // trkseg
+                    await writer.WriteEndElementAsync(); // trk
                 }
 
                 // Write GPX footer
                 await writer.WriteEndElementAsync(); // gpx
                 await writer.WriteEndDocumentAsync();
 
-                writer.Flush(); // <-- Ensure all data is written to disk
+                writer.Flush();
             }
             catch (Exception ex)
             {
